@@ -17,6 +17,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/matrix.h>
 #include <zmk/sensors.h>
 #include <zmk/virtual_key_position.h>
+#include <zmk/rgb_underglow.h>
 
 #include <zmk/event_manager.h>
 #include <zmk/events/position_state_changed.h>
@@ -130,6 +131,43 @@ uint8_t map_layer_id_to_index(zmk_keymap_layer_id_t layer_id) {
 #define LAYER_ID_TO_INDEX(_layer) _layer
 
 #endif // IS_ENABLED(CONFIG_ZMK_KEYMAP_LAYER_REORDERING)
+
+#define LAYER_Base 0
+#define LAYER_win 1
+#define LAYER_shortcuts 2
+#define LAYER_symbols 3
+#define LAYER_functions 4
+#define LAYER_shortcuts_win 5
+
+static int layer_state_changed_listener(const zmk_event_t *ev) {
+    zmk_keymap_layer_index_t index = zmk_keymap_highest_layer_active();
+
+    zmk_rgb_underglow_on();
+
+    switch (index) {
+    case LAYER_Base:
+        zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){.h = 0, .s = 0, .b = 100});
+        break;
+    case LAYER_win:
+        zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){.h = 240, .s = 100, .b = 100});
+        break;
+    case LAYER_shortcuts:
+    case LAYER_shortcuts_win:
+        zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){.h = 42, .s = 100, .b = 100});
+        break;
+    case LAYER_symbols:
+        zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){.h = 120, .s = 100, .b = 100});
+        break;
+    case LAYER_functions:
+        zmk_rgb_underglow_set_hsb((struct zmk_led_hsb){.h = 300, .s = 100, .b = 100});
+        break;
+    }
+
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(led, layer_state_changed_listener);
+ZMK_SUBSCRIPTION(led, zmk_layer_state_changed);
 
 static inline int set_layer_state(zmk_keymap_layer_id_t layer_id, bool state) {
     int ret = 0;
