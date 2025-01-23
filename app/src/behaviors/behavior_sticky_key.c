@@ -233,6 +233,7 @@ static int sticky_key_parameter_domains(const struct device *sk,
 static const struct behavior_driver_api behavior_sticky_key_driver_api = {
     .binding_pressed = on_sticky_key_binding_pressed,
     .binding_released = on_sticky_key_binding_released,
+    .locality = BEHAVIOR_LOCALITY_GLOBAL,
 #if IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
     .get_parameter_metadata = sticky_key_parameter_domains,
 #endif // IS_ENABLED(CONFIG_ZMK_BEHAVIOR_METADATA)
